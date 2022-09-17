@@ -3,15 +3,13 @@ let input = document.getElementById("input");
 let msg = document.getElementById("msg");
 let posts = document.getElementById("posts");
 
-// var data = JSON.parse(localStorage.getItem("data"));
-
 form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    console.log("button clicked");
-    formValidation();
-  });
-  
-  let formValidation = () => {
+  e.preventDefault();
+  console.log("button clicked");
+  formValidation();
+});
+
+let formValidation = () => {
   if (input.value === "") {
     msg.innerHTML = "Post cannot be blank";
     console.log("Error");
@@ -22,32 +20,48 @@ form.addEventListener("submit", (e) => {
   }
 };
 
-let data = [];
+let data;
+
+if (localStorage.information != null) {
+  data = JSON.parse(localStorage.information);
+} else {
+  data = [];
+}
 
 let acceptData = () => {
-    data["text"] = input.value;
-    console.log(data);
-    createPost();
+  var info = {
+    input: input.value,
   };
+  // data["text"] = input.value;
+  data.push(info);
+  localStorage.setItem("information", JSON.stringify(data));
+  console.log(data);
+  createPost();
+};
 
-  let createPost = () => {
-    posts.innerHTML += `
+let createPost = () => {
+  for(let i = 0; i < data.length; i++){
+  posts.innerHTML += `
     <div>
-      <p>${data.text}</p>
+      <p>${data[i].input}</p>
       <span class="options">
         <i onClick="editPost(this)" class="fas fa-edit"></i>
-        <i onClick="deletePost(this)" class="fas fa-trash-alt"></i>
+        <i onClick="deletePost(${i})" class="fas fa-trash-alt"></i>
       </span>
     </div>
     `;
-    input.value = "";
-  };
+  input.value = "";
+  }
+};
 
-  let deletePost = (e) => {
-    e.parentElement.parentElement.remove();
-  };
+let deletePost = (i) => {
+  // e.parentElement.parentElement.remove();
+  data.splice(i,1);
+  localStorage.information = JSON.stringify(data);
+  createPost()
+};
 
-  let editPost = (e) => {
-    input.value = e.parentElement.previousElementSibling.innerHTML;
-    e.parentElement.parentElement.remove();
-  };
+let editPost = (e) => {
+  input.value = e.parentElement.previousElementSibling.innerHTML;
+  e.parentElement.parentElement.remove();
+};
